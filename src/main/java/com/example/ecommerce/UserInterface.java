@@ -10,154 +10,318 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+
+import java.util.regex.Pattern;
 
 public class UserInterface {
 
     GridPane loginPage;
+    GridPane newAccPage;
     HBox headerBar;
     HBox footerBar;
-    Button signInButton;
-    Label welcomeLabel;
-
     VBox body;
 
-    Customer loggedincustomer;
+
+    Label welcomeLable;
+    Button signInButton;
+    Customer loggedInCustomer;
+    Button placeOrderButton;
 
     ProductList productList = new ProductList();
-    VBox productPage;
-
-    Button placeOrderButton = new Button("Place Order");
-
     ObservableList<Product> itemsInCart = FXCollections.observableArrayList();
-
+    VBox productPage;
+    VBox searchedProductPage;
+    VBox orderdProductPage;
     public BorderPane createContent(){
-        BorderPane root =new BorderPane();
-        root.setPrefSize(800,600);
-        // root.getChildren().add(loginPage);
+        BorderPane root = new BorderPane();
+        root.setPrefSize(1000,700);
+
+
+        root.setBackground(new Background(new BackgroundFill(Color.BURLYWOOD, CornerRadii.EMPTY, Insets.EMPTY)));
         root.setTop(headerBar);
-        //  root.setCenter(loginPage);
         body = new VBox();
         body.setPadding(new Insets(10));
         body.setAlignment(Pos.CENTER);
         root.setCenter(body);
+
         productPage = productList.getAllProducts();
         body.getChildren().add(productPage);
 
-        root.setBottom(footerBar);
 
+
+        root.setBottom(footerBar);
 
         return root;
     }
-
-    public UserInterface(){
+    UserInterface(){
         createLoginPage();
+        createNewAccPage();
         createHeaderBar();
         createFooterBar();
     }
-    private void createLoginPage(){
+
+    private void createNewAccPage(){
+        Text yourName = new Text("Your Name");
+
+
+        TextField yourNameInput = new TextField();
+        yourNameInput.setPromptText("First & Last Name");
+
+
+        Text email = new Text("Email");
+        Text password2 = new Text("Create Password");
+
+        Text mobileNo = new Text("Mobile No.");
+        TextField moblieNoInput = new TextField();
+        moblieNoInput.setPromptText("At least 10 digit");
+
+        TextField emailInput = new TextField();
+        emailInput.setPromptText("Enter email");
+        PasswordField passwordInput2 = new PasswordField();
+        passwordInput2.setPromptText("At least 6 digit");
+
+        Text addresstext = new Text("Address");
+        TextField addressInput = new TextField();
+        addressInput.setPromptText("House No, Area, City, ZIPCODE");
+
+        Button continueButton = new Button("Continue");
+        //continueButton.setStyle("-fx-background-color: black, -fx-text-color: white;");
+
+
+        CheckBox termConditions = new CheckBox();
+        termConditions.setSelected(true);
+        Text termConText = new Text("I agree to the Terms of Service & Privacy Policy");
+
+        newAccPage = new GridPane();
+        newAccPage.setAlignment(Pos.CENTER);
+        newAccPage.setHgap(10);
+        newAccPage.setVgap(10);
+        newAccPage.add(yourName,0,1);
+        newAccPage.add(yourNameInput,1,1);
+        newAccPage.add(email,0,2);
+        newAccPage.add(emailInput,1,2);
+        newAccPage.add(mobileNo,0,3);
+        newAccPage.add(moblieNoInput,1,3);
+        newAccPage.add(password2,0,4);
+        newAccPage.add(passwordInput2,1,4);
+        newAccPage.add(addresstext,0,5);
+        newAccPage.add(addressInput,1,5);
+        newAccPage.add(termConditions,0,6);
+        newAccPage.add(termConText,1,6);
+        newAccPage.add(continueButton,1,8);
+
+        continueButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                String getInputName = yourNameInput.getText();
+                String getInputEmail = emailInput.getText();
+                String getInputMoblie = moblieNoInput.getText();
+                String getInputPass = passwordInput2.getText();
+                String getInputAddress = addressInput.getText();
+
+                if(!getInputName.trim().isEmpty() && !getInputEmail.trim().isEmpty() && !getInputMoblie.trim().isEmpty() && !getInputPass.trim().isEmpty() && getInputPass.length() > 6 && EMAIL_PATTERN.matcher(getInputEmail).matches()){
+                    SignIn_NewCustomer signIn = new SignIn_NewCustomer();
+                    if(signIn.customerSignIn(getInputName, getInputEmail, getInputMoblie, getInputPass,getInputAddress)){
+                        body.getChildren().clear();
+                        body.getChildren().add(loginPage);
+                    }
+
+                }else{
+                    continueButton.setText("Fill all Details Correctly and Continue");
+                }
+
+
+
+            }
+        });
+
+
+    }
+
+    public void createLoginPage(){
         Text userNameText = new Text("User Name");
         Text passwordText = new Text("Password");
 
-        TextField userName = new TextField(""); // hardcoding so that we dont have to input everytime for testing
-        userName.setPromptText("Type your user name here");
-        PasswordField password = new PasswordField();
-        password.setText("");
-        password.setPromptText("Type your password here");
-        Label messageLabel = new Label("Hello");
+        TextField userNameInput = new TextField("");
 
-        Button loginButton = new Button("Login");
+        userNameInput.setPromptText("Enter email");
+        PasswordField passwordInput = new PasswordField();
+        passwordInput.setText("");
+        passwordInput.setPromptText("Enter Password");
+
+        Button login = new Button("Login");
+        login.setStyle("-fx-background-color: ivory; ");
+
+        Button createNewAcc = new Button("Create New Account");
+        createNewAcc.setStyle("-fx-background-color: white; ");
+        createNewAcc.setPrefSize(200,10);
+
+        Label messageLable = new Label("Hi");
+        Button AccCreatedSucc = new Button("Account Created Successfully");
+        AccCreatedSucc.setPrefSize(200,20);
+        AccCreatedSucc.setStyle("-fx-background-color: white; ");
+        AccCreatedSucc.setPrefSize(200,10);
+        AccCreatedSucc.setVisible(false);
+
 
         loginPage = new GridPane();
-        // loginPage.setStyle("-fx-background-color:grey;");
+
+
         loginPage.setAlignment(Pos.CENTER);
         loginPage.setHgap(10);
         loginPage.setVgap(10);
         loginPage.add(userNameText,0,0);
-        loginPage.add(userName,1,0);
+        loginPage.add(userNameInput,1,0);
         loginPage.add(passwordText,0,1);
-        loginPage.add(password,1,1);
-        loginPage.add(messageLabel,0,2);
-        loginPage.add(loginButton,1,2);
+        loginPage.add(passwordInput,1,1);
+        loginPage.add(messageLable,0,2);
 
-        loginButton.setOnAction(new EventHandler<ActionEvent>() {
+        loginPage.add(login,1,2);
+        loginPage.add(createNewAcc,1,4);
+        loginPage.add(AccCreatedSucc,1,4);
+
+        login.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                //   String userName=userNameText.getText();
-                //   messageLabel.setText(userName);
-                String name = userName.getText();
-                String pass = password.getText();
-                Login login =new Login();
-                loggedincustomer= login.customerLogin(name,pass);
-                if(loggedincustomer!=null){
-                    messageLabel.setText("Welcome "+loggedincustomer.getName());
-                    welcomeLabel.setText("Welcome "+loggedincustomer.getName());
-                    headerBar.getChildren().add(welcomeLabel);
+                String name = userNameInput.getText();
+                String pass = passwordInput.getText();
+                Login login = new Login();
+                loggedInCustomer = login.customerLogin(name, pass);
+
+                createNewAcc.setVisible(true);
+                AccCreatedSucc.setVisible(false);
+
+                if(loggedInCustomer != null){
+                    messageLable.setText("Welcome "+ loggedInCustomer.getName());
+                    welcomeLable.setText( "Welcome " + loggedInCustomer.getName());
+
+                    String UniversalName = loggedInCustomer.getName();
+
                     body.getChildren().clear();
                     body.getChildren().add(productPage);
-                }
-                else{
-                    messageLabel.setText("login failed !! please enter correct username or password.");
+                    footerBar.setVisible(true);
+
+
+                }else {
+
+                    messageLable.setText("Login Failed !! please give correct user name and password.");
                 }
             }
         });
+
+        createNewAcc.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+
+                body.getChildren().clear();
+                body.getChildren().add(newAccPage);
+                footerBar.setVisible(false);
+                createNewAcc.setVisible(false);
+                AccCreatedSucc.setVisible(true);
+
+
+
+            }
+        });
+
+
     }
 
     private void createHeaderBar(){
-        Button homeButton =  new Button();
-        Image image1 = new Image("C:\\Users\\hp\\OneDrive\\Desktop\\HarshEcommerce\\Ecommerce\\src\\img.png");
-        ImageView imageView = new ImageView();
-        imageView.setImage(image1);
-        imageView.setFitHeight(20);
-        imageView.setFitWidth(80);
-        homeButton.setGraphic(imageView);
 
-        TextField searchBar = new TextField();
-        searchBar.setPromptText("Search here");
-        searchBar.setPrefWidth(300);
+        Button homeButton = new Button();
+        homeButton.setStyle("-fx-background-color: black; ");
+//        Image imageHome = new Image("C:\\Users\\hp\\OneDrive\\Desktop\\HarshEcommerce\\ecommerce\\src\\img_6.png");
+//        ImageView imageViewHome = new ImageView();
+//        imageViewHome.setImage(imageHome);
+//        imageViewHome.setFitWidth(120);
+//        imageViewHome.setFitHeight(30);
+//        homeButton.setGraphic(imageViewHome);
 
-        Button searchButton = new Button("Search");
+        TextField search = new TextField();
+        search.setPromptText("Search Here");
+        search.setPrefWidth(500);
+        search.setPrefHeight(30);
+
+        Button searchButton = new Button();
+        searchButton.setStyle("-fx-background-color: black ");
+//        Image image = new Image("C:\\Users\\hp\\OneDrive\\Desktop\\HarshEcommerce\\ecommerce\\src\\img_6.png");
+//        ImageView imageView = new ImageView();
+//        imageView.setImage(image);
+//        imageView.setFitWidth(55);
+//        imageView.setFitHeight(23);
+//        searchButton.setGraphic(imageView);
+
+        Button cartButton = new Button();
+        cartButton.setStyle("-fx-background-color: black; ");
+        cartButton.setPrefSize(60,30);
+//        Image imageCart = new Image("C:\\Users\\hp\\OneDrive\\Desktop\\HarshEcommerce\\ecommerce\\src\\img_4.png");
+//        ImageView imageViewCart = new ImageView();
+//        imageViewCart.setImage(imageCart);
+//        imageViewCart.setFitWidth(60);
+//        imageViewCart.setFitHeight(25);
+//        cartButton.setGraphic(imageViewCart);
+
+        Button ordersButton = new Button("Orders");
+        Font font2 = Font.font("Verdana", FontWeight.BOLD, 11);
+        ordersButton.setFont(font2);
+        ordersButton.setStyle("-fx-background-color: black; ");
+        ordersButton.setTextFill(Color.WHITE);
+
 
         signInButton = new Button("Sign In");
+        Font font = Font.font("Verdana", FontWeight.BOLD, 11);
+        signInButton.setFont(font);
+        signInButton.setStyle("-fx-background-color: black;");
+        signInButton.setTextFill(Color.WHITE);
+        signInButton.setPrefSize(60,30);
 
-        welcomeLabel = new Label();
+        placeOrderButton = new Button("Place Order");
+        placeOrderButton.setPrefSize(150,25);
+        placeOrderButton.setStyle("-fx-background-color: black; ");
+        placeOrderButton.setTextFill(Color.WHITE);
 
-        Button cartButton = new Button("");
+        welcomeLable = new Label();
+//        Font font3 = Font.font("Verdan", FontWeight.BOLD,11);
+//        welcomeLable.setFont(font3);
+        welcomeLable.setStyle("-fx-font-size : 10pt; -fx-font-weight : bold;");
+        welcomeLable.setTextFill(Color.WHITE);
 
-        //  Button orderButton = new Button("Orders");
 
         headerBar = new HBox();
-        //  headerBar.setStyle("-fx-background-color:grey;");
+        headerBar.setStyle("-fx-background-color: black; ");
         headerBar.setPadding(new Insets(10));
-        headerBar.setSpacing(10);
         headerBar.setAlignment(Pos.CENTER);
-        headerBar.getChildren().addAll(homeButton,searchBar,searchButton,signInButton,cartButton);
+        headerBar.setSpacing(10);
+        headerBar.getChildren().addAll(homeButton, search, searchButton,ordersButton,cartButton,welcomeLable,signInButton);
 
         signInButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                body.getChildren().clear();// remove everything
-                body.getChildren().add(loginPage); //  put login page
+                body.getChildren().clear();
+                body.getChildren().add(loginPage);
                 headerBar.getChildren().remove(signInButton);
+                footerBar.setVisible(false);
             }
         });
 
-        Image image2 = new Image("C:\\Users\\hp\\OneDrive\\Desktop\\HarshEcommerce\\Ecommerce\\src\\img_2.png");
-        ImageView imageView2 = new ImageView();
-        imageView2.setImage(image2);
-        imageView2.setFitHeight(20);
-        imageView2.setFitWidth(80);
-        cartButton.setGraphic(imageView2);
         cartButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 body.getChildren().clear();
-                VBox prodPage = productList.getProductsInCart(itemsInCart);
-                prodPage.setAlignment(Pos.CENTER);
-                prodPage.setSpacing(10);
-                prodPage.getChildren().add(placeOrderButton);
-                body.getChildren().add(prodPage);
-                footerBar.setVisible(false); //all cases needs to be handled
+
+                VBox productPageforCart = productList.getProductsInCart(itemsInCart);
+                productPageforCart.setSpacing(10);
+                productPageforCart.getChildren().add(placeOrderButton);
+
+                productPageforCart.setAlignment(Pos.CENTER);
+                body.getChildren().add(productPageforCart);
+                footerBar.setVisible(false);
             }
         });
 
@@ -165,103 +329,149 @@ public class UserInterface {
             @Override
             public void handle(ActionEvent actionEvent) {
                 //need list of products and a customer
-                if(itemsInCart==null){
-                    //please select a product first to place order
-                    showDialog("Please add some products in the cart to place order");
+                if(itemsInCart == null){
+                    //please select a product to place a order
+                    showDialoge("Please add some products in the cart to place order");
                     return;
                 }
-                if(loggedincustomer == null){
-                    showDialog("Please login first to place order");
+                if(loggedInCustomer == null){
+                    showDialoge("Please Login First To Place Order");
                     return;
                 }
-                int count = Order.placeMultipleOrder(loggedincustomer, itemsInCart);
-                if(count!=0){
-                    showDialog("Order for "+count+" products placed successfully!!");
 
-                    body.getChildren().clear();
-                    VBox prodPage = productList.removeAllProducts();
-                    prodPage.setAlignment(Pos.CENTER);
-                    prodPage.setSpacing(10);
-                    //prodPage.getChildren().add(placeOrderButton);
-                    body.getChildren().add(prodPage);
+                int count = Orders.placeMultipleOrder(loggedInCustomer,itemsInCart);
+                if(count != 0){
+                    showDialoge("Order For "+count+ " Products Placed Successfull");
+                }else {
+                    showDialoge("Order Failed");
+                }
 
-                }
-                else{
-                    showDialog("Order failed!!");
-                }
+
             }
         });
+
         homeButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 body.getChildren().clear();
+                productPage = productList.getAllProducts();
                 body.getChildren().add(productPage);
                 footerBar.setVisible(true);
-                if(loggedincustomer==null && headerBar.getChildren().indexOf(signInButton)==-1){
+                search.clear();
+                if(loggedInCustomer == null && headerBar.getChildren().indexOf(signInButton) == -1){
                     headerBar.getChildren().add(signInButton);
                 }
+            }
+        });
 
+        ordersButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if(loggedInCustomer == null){
+                    showDialoge("Please Login First To View Your Orders");
+                    return;
+                }
+                String User = loggedInCustomer.getName();
+                body.getChildren().clear();
+                orderdProductPage = productList.getAllOrderdProducts(User);
+                body.getChildren().add(orderdProductPage);
+                footerBar.setVisible(false);
+            }
+        });
+
+        searchButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                String getProductName = search.getText();
+                if(!getProductName.isEmpty()){
+                    body.getChildren().clear();
+                    searchedProductPage = productList.getSearchedProduct(getProductName);
+                    body.getChildren().add(searchedProductPage);
+
+
+                }
             }
         });
     }
 
 
     private void createFooterBar(){
-        Button buyNowButton = new Button("BuyNow");
+
+        Button buyNowButton = new Button("Buy Now");
+        buyNowButton.setPrefSize(200,25);
+        buyNowButton.setStyle("-fx-background-color: black; ");
+        buyNowButton.setTextFill(Color.WHITE);
+
+
         Button addToCartButton = new Button("Add to Cart");
+        addToCartButton.setPrefSize(200,25);
+        addToCartButton.setStyle("-fx-background-color: black; ");
+        addToCartButton.setTextFill(Color.WHITE);
 
 
         footerBar = new HBox();
-        //  headerBar.setStyle("-fx-background-color:grey;");
-        footerBar.setPadding(new Insets(10));
-        footerBar.setSpacing(10);
+        footerBar.setPadding(new Insets(30));
         footerBar.setAlignment(Pos.CENTER);
-        footerBar.getChildren().addAll(buyNowButton,addToCartButton);
+        footerBar.setSpacing(20);
+        footerBar.getChildren().addAll(addToCartButton,buyNowButton);
 
         buyNowButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                Product product = productList.getSelectedProduct();
-                if(product==null){
-                    //please select a product first to place order
-                    showDialog("Please select a product first to place order!");
+                Product selectedProduct = productList.getSelectedProduct();
+                if(selectedProduct == null){
+                    //please select a product to place a order
+                    showDialoge("Please select a product before placeing an order");
                     return;
                 }
-                if(loggedincustomer==null){
-                    showDialog("Please login first to place an order");
+                if(loggedInCustomer == null){
+                    showDialoge("Please Login First To Buy An Product");
                     return;
                 }
-                boolean status = Order.placeOrder(loggedincustomer,product);
-                if(status==true){
-                    showDialog("Order placed successfully!!");
-                    //itemsInCart.removeAll(product);
+
+                if(!itemsInCart.isEmpty()){
+                    showDialoge(" Order Failed!! You Have Items in Cart Please Continue From There.");
+                    return;
                 }
-                else{
-                    showDialog("Order failed!");
+
+
+
+                boolean isPlaced = Orders.placeSingleOrder(loggedInCustomer,selectedProduct);
+                if(isPlaced){
+                    showDialoge("Your Order Placed Successfully");
                 }
+
+
             }
         });
+
         addToCartButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+
                 Product product = productList.getSelectedProduct();
-                if(product==null){
-                    //please select a product first to place order
-                    showDialog("Please select a product first to add it to the cart!");
+                if(product == null){
+                    showDialoge("Please select a product before adding in Cart");
                     return;
                 }
                 itemsInCart.add(product);
-                showDialog("Selected item has been added to the cart successfully");
+                showDialoge("Selected Product Add Successfully");
             }
+
         });
 
-    }
 
-    private void showDialog(String message){
+    }
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*(\\.\\w{2,3})+$"
+    );
+
+    private void showDialoge(String message){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Message");
         alert.setHeaderText(null);
         alert.setContentText(message);
-        alert.setTitle("Message");
         alert.showAndWait();
     }
 }
+
