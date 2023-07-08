@@ -1,41 +1,31 @@
 package com.example.ecommerce;
 
-import javafx.collections.ObservableList;
 
 import java.sql.ResultSet;
 
-public class Order {
-    public static boolean placeOrder(Customer customer,Product product){
-        String groupOrderId = "SELECT max(group_order_id) +1 id FROM orders";
-        Dbconnection dbConnection = new Dbconnection();
+public class Login {
+    public Customer customerLogin(String userName, String password){
+
+        String loginQuery = "SELECT * FROM customer WHERE email = '"+userName+"' AND password= '"+password+"'";
+        DbConnection conn = new DbConnection();
+        ResultSet rs = conn.getQueryTable(loginQuery);
+
         try{
-            ResultSet rs = dbConnection.getQueryTable(groupOrderId);
             if(rs.next()){
-                String placeOrder = "INSERT INTO orders(group_order_id, customer_id, product_id) VALUES("+rs.getInt("id")+","+customer.getId()+ ","+product.getId()+")";
-                return  dbConnection.updateDatabase(placeOrder) !=0;
+                return new Customer(rs.getInt("id"), rs.getString("name"),
+                        rs.getString("email"), rs.getString("mobile"));
             }
-        }catch (Exception e) {
+
+        }catch (Exception e){
             e.printStackTrace();
         }
-        return false;
+        return null;
     }
 
-    public static int placeMultipleOrder(Customer customer, ObservableList<Product> productList){
-        String groupOrderId = "SELECT max(group_order_id) +1 id FROM orders";
-        Dbconnection dbConnection = new Dbconnection();
-        try{
-            ResultSet rs = dbConnection.getQueryTable(groupOrderId);
-            int count=0;
-            if(rs.next()){
-                for(Product product : productList) {
-                    String placeOrder = "INSERT INTO orders(group_order_id, customer_id, product_id) VALUES(" + rs.getInt("id") + "," + customer.getId() + "," + product.getId() + ")";
-                    count+= dbConnection.updateDatabase(placeOrder);
-                }
-                return count;
-            }
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
+//    public static void main(String[] args) {
+//        Login login = new Login();
+//        Customer customer = login.customerLogin("aniketRane@gmail.com", "Aniket@123");
+//        System.out.println("Welcome "+customer.getName());
+//    }
+
 }
