@@ -1,18 +1,16 @@
 package com.example.ecommerce;
-
 import java.sql.*;
 
-public class Dbconnection {
+public class DbConnection {
+    private  final String dbUrl = "jdbc:mysql://localhost:3306/ecommerce";
+    private final String userName = "root";
+    private final String password = "root";
 
-    private static final String dbUrl="jdbc:mysql://localhost:3306/Ecommerce";
-    private static final String userName="root";
-    private static final String password="root";
-
-    private Statement getStatement(){
+    private Statement getStatement() {
         try{
-            Connection connection = DriverManager.getConnection(dbUrl, userName, password);
+            Connection connection = DriverManager.getConnection(dbUrl,userName,password);
             return connection.createStatement();
-        }catch(Exception e){
+        }catch (Exception e){
             e.printStackTrace();
         }
         return null;
@@ -22,30 +20,31 @@ public class Dbconnection {
         try{
             Statement statement = getStatement();
             return statement.executeQuery(query);
-        }catch(Exception e){
+        }catch (Exception e){
             e.printStackTrace();
         }
-
         return null;
     }
+
     public int updateDatabase(String query){
         try{
             Statement statement = getStatement();
             return statement.executeUpdate(query);
-        }catch(Exception e){
+        }catch (Exception e){
             e.printStackTrace();
         }
-
         return 0;
     }
-    public static void main(String[] args) {
-        Dbconnection conn = new Dbconnection();
-        ResultSet rs = conn.getQueryTable("SELECT * FROM customer");
-        if(rs!=null){
-            System.out.println("successfull");
-        }else{
-            System.out.println("failed");
-        }
-    }
 
+
+
+//    public static void main(String[] args) {
+//        DbConnection conn = new DbConnection();
+//        ResultSet rs = conn.getQueryTable("select * from customer");
+//        if(rs != null){
+//            System.out.println("Connection Successfull");
+//        }else {
+//            System.out.println("Connection Faild");
+//        }
+//    }
 }
